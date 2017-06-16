@@ -14,27 +14,9 @@ function love.load()
 
 	DEBUG = true
 
-	local kor = env:newKor(20,100,0,{100,100,0},"Data/n10.png",true)
+	map:load("w1.lua")
 
-	coords = {-10,-10,10,-10,70,70,-10,10}
-	env:addPoli(kor:getBody(),coords,{0,100,100},"Data/n10.png")
-
-	env:addKor(kor:getBody(),20,50,-200,{80,200,100},'Data/n10.png')
-
-	kor:getBody():setLinearVelocity(0,-4)
-
-
-
-	coords = {-10+60,-10+60,10+60,-10+60,70+60,70+60,-10+60,10+60}
-	local kocka = env:newPoli(coords,{100,0,100},"Data/n10.png")
-
-	env:addKor(kocka:getBody(),20,-100,0,{80,200,100},'Data/n10.png')
-
-	coords = {-150,-150,-60,-80,-60,-60,-80,-60}
-	env:addPoli(kocka:getBody(),coords,{0,100,100},"Data/n10.png")
-
-	kocka:getBody():setAngularVelocity(0.4)
-
+	map:save("w3.lua")
 
 	canvas = love.graphics.newCanvas(kepernyo.asz,kepernyo.am)
 
@@ -69,4 +51,8 @@ function love.draw()
 	love.graphics.draw(canvas)
 
 	love.graphics.print("HUD",10,10)
+end
+
+function love.mousepressed(x, y, button, istouch)
+	player.kattintas(x,y,button,istouch)
 end

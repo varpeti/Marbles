@@ -15,7 +15,9 @@ local player = {
 			if love.keyboard.isDown("up") then
 					self.y = self.y - (self.speed*dt)
 			end
-		end
+		end,
+	kattintas=function(self,x,y,button,istouch)
+	end,
 	}
 
 return player

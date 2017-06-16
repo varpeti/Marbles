@@ -7,13 +7,7 @@ env.world:setCallbacks(beginContact, endContact, preSolve, postSolve) --Ütköz�
 	data t
 		szin l {r,g,b}
 		img u
-		ese f
-]]
---[[
-	ese(t) --esemény
-		t t
-
-
+		ese t
 ]]
 
 local function CoM(coords) -- vissza adja a tömegközépontot, és az eltolási távot
@@ -84,6 +78,17 @@ local function udata(fixture,szin,img,ese,rx,ry,mx,my)
 	mx = mx or 0
 	my = my or 0
 
+	local esepro = { -- deffault értékek, hogy ha nem definiálja őket az user akkor se bugoljon
+		init=function(fixture) end,
+		time=function(fixture,dt) end,
+		beginContact=function(fixture,b,coll) end,
+		endContact=function(fixture,b,coll) end,
+		preSolve=function(fixture,b,coll) end,
+		postSolve=function(fixture,b,coll,normalimpulse,tangentimpulse) end,
+		user=function(...) end
+	}
+	setmetatable(ese,{__index=esepro})
+
 	local data = {
 		szin=szin,
 		img=nil,
@@ -91,24 +96,27 @@ local function udata(fixture,szin,img,ese,rx,ry,mx,my)
 		mx=mx,
 		my=my,
 		rx=rx,
-		ry=ry
+		ry=ry,
+		fixture=fixture
 	}
 	if img then 
 		data.img=cutimage(fixture,love.graphics.newImage(img),rx,ry,mx,my) 
 	end
 
 	fixture:setUserData(data)
+
+	data.ese.init(fixture) -- meghívja hogy elkészült
 end
 
 
-function env:newPoli(coords,szin,img,dim,ese)
+function env:newPoli(coords,szin,img,dynamic,ese)
 
 	if #coords<(2*3) or #coords>(2*8) then return end
 
 	local x,y,rx,ry = CoM(coords)
 
 	local body 
-	if dim then
+	if dynamic then
 		body = love.physics.newBody(self.world, x, y, "dynamic") -- fizikai test
 	else
 		body = love.physics.newBody(self.world, x, y, "kinematic") -- nem befojásolják más objektumok, de mozgatható
@@ -144,12 +152,12 @@ function env:addPoli(body,coords,szin,img,ese)
 	return fixture
 end
 
-function env:newKor(r,x,y,szin,img,dim,ese)
+function env:newKor(r,x,y,szin,img,dynamic,ese)
 
 	if r<1 then return end
 
 	local body 
-	if dim then
+	if dynamic then
 		body = love.physics.newBody(self.world, x, y, "dynamic") -- fizikai test
 	else
 		body = love.physics.newBody(self.world, x, y, "kinematic") -- nem befojásolják más objektumok, de mozgatható
@@ -170,8 +178,6 @@ function env:addKor(body,r,x,y,szin,img,ese)
 	local shape = love.physics.newCircleShape(x,y,r)
 
 	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
-
-	--Van egy bug: nem változtatja meg a hozzáadott CircleShape a Body tömegközéppontját
 
 	udata(fixture,szin,img,ese,r,r,x,y)
 
@@ -255,21 +261,24 @@ end
 
 function beginContact(a, b, coll)
 	
-	local aUserData = a:getUserData()
-	local bUserData = b:getUserData()
+	a:getUserData().ese.beginContact(a,b,coll)
+	b:getUserData().ese.beginContact(b,a,coll)
 	
 end
 
 function endContact(a, b, coll)
-	
+	a:getUserData().ese.endContact(a,b,coll)
+	b:getUserData().ese.endContact(b,a,coll)
 end
 
 function preSolve(a, b, coll)
-	
+	a:getUserData().ese.preSolve(a,b,coll)
+	b:getUserData().ese.preSolve(b,a,coll)
 end
 
 function postSolve(a, b, coll, normalimpulse, tangentimpulse)
-	
+	a:getUserData().ese.postSolve(a,b,coll,normalimpulse,tangentimpulse)
+	b:getUserData().ese.postSolve(b,a,coll,normalimpulse,tangentimpulse)
 end
 
 
