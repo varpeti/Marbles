@@ -3,16 +3,16 @@ local player = {
 	y=0,
 	speed=500,
 	mozgas=function(self,dt)
-			if love.keyboard.isDown("right") then
+			if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
 					self.x = self.x + (self.speed*dt)
 			end
-			if love.keyboard.isDown("left") then
+			if love.keyboard.isDown("a") or love.keyboard.isDown("left") then
 					self.x = self.x - (self.speed*dt)
 			end
-			if love.keyboard.isDown("down") then
+			if love.keyboard.isDown("s") or love.keyboard.isDown("down") then
 					self.y = self.y + (self.speed*dt)
 			end
-			if love.keyboard.isDown("up") then
+			if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
 					self.y = self.y - (self.speed*dt)
 			end
 		end,
@@ -58,6 +58,15 @@ local player = {
 				end
 			elseif button==3 then
 				env:newKor(15,x,y,{255,255,255},nil,true,nil)
+			elseif button==4 then
+				for b,body in ipairs(env.world:getBodyList()) do
+					for f,fixture in ipairs(body:getFixtureList()) do
+						if fixture:testPoint(x,y) then 
+							print(fixture:getUserData().usd)
+							return
+						end
+					end
+				end
 			end
 		end,
 	draw=function()

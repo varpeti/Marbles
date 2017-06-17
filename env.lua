@@ -1,7 +1,6 @@
 local env = {}
 
-env.world = love.physics.newWorld(0, 300, true)
-env.world:setCallbacks(beginContact, endContact, preSolve, postSolve) --Ütközés lekérdezés
+env.world = love.physics.newWorld(0, 600, true)
 
 --[[
 	data t
@@ -232,12 +231,7 @@ function env:draw()
 				love.graphics.circle("line",x,y,radius)
 				love.graphics.setColor(255,255,255,255)
 				if data.img then love.graphics.draw(data.img,x,y,body:getAngle(),1,1,radius,radius) end
-					if DEBUG then 
-						local bx,by = body:getPosition()
-						love.graphics.setColor(255,255,255,255)
-						love.graphics.circle("fill",x,y,5)
-						love.graphics.line(x,y,bx,by)
-					end
+					local bd = body:getUserData() if bd then body:setPosition(bd[1],bd[2]) body:setUserData(nil) end
 			elseif (shapeType == "polygon") then
 				local points = {body:getWorldPoints(shape:getPoints())}
 				love.graphics.setColor(data.szin[1],data.szin[2],data.szin[3],122)
@@ -247,12 +241,11 @@ function env:draw()
 				love.graphics.setColor(255,255,255,255)
 				local x,y = body:getWorldPoints(data.mx,data.my)
 				if data.img then love.graphics.draw(data.img,x,y,body:getAngle(),1,1,data.rx,data.ry) end
-					if DEBUG then 
+					if true or DEBUG then 
 						local bx,by = body:getPosition()
 						love.graphics.setColor(255,255,255,255)
 						love.graphics.circle("fill",x,y,5)
 						love.graphics.line(x,y,bx,by)
-						love.graphics.print("	"..data.usd,x,y)
 					end
 			end
 
@@ -274,11 +267,13 @@ end
 
 --Ütközések
 
+function env.setCallbacks()
+	env.world:setCallbacks(beginContact, endContact, preSolve, postSolve) --Ütközés lekérdezés
+end
+
 function beginContact(a, b, coll)
-	
 	a:getUserData().ese.beginContact(a,b,coll)
 	b:getUserData().ese.beginContact(b,a,coll)
-	
 end
 
 function endContact(a, b, coll)

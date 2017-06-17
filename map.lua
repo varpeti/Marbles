@@ -55,7 +55,7 @@ function map:addObj(coords,szin,name)
 	until(ok)
 	
 
-	table.insert(self.world,{0,0,coords,szin,nil,"return {\n\t}",name})
+	table.insert(self.world,{0,0,coords,szin,nil,"return {}",name})
 
 	return name
 end

@@ -12,10 +12,11 @@ function love.load()
 	love.window.setTitle("Marble Race - Váraljai Péter")
 	love.window.setIcon(love.image.newImageData("Data/icon.png"))
 
-	DEBUG = true
+	DEBUG = false
+
+	env.setCallbacks()
 
 	map:load("w1.luw")
-
 
 	canvas = love.graphics.newCanvas(kepernyo.asz,kepernyo.am)
 
@@ -49,15 +50,21 @@ function love.draw()
 	love.graphics.print("HUD",10,10)
 end
 
-function love.mousepressed(x, y, button, istouch)
-	player.kattintas(x,y,button,istouch)
-end
-
 function love.quit()
 	map:save("w1.luw")
+end
+
+function love.mousepressed(x, y, button, istouch)
+	player.kattintas(x,y,button,istouch)
 end
 
 function love.wheelmoved(x,y)
 	if y>0 then kamera:rScale(-0.1) end
 	if y<0 then kamera:rScale(0.1) end
+end
+
+function love.keypressed(key, scancode, isrepeat )
+	if key=="space" then
+		marbles.start()
+	end
 end
