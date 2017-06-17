@@ -1,6 +1,6 @@
 local env = {}
 
-env.world = love.physics.newWorld(0, 0, true)
+env.world = love.physics.newWorld(0, 300, true)
 env.world:setCallbacks(beginContact, endContact, preSolve, postSolve) --Ütközés lekérdezés
 
 --[[
@@ -9,6 +9,18 @@ env.world:setCallbacks(beginContact, endContact, preSolve, postSolve) --Ütköz�
 		img u
 		ese t
 ]]
+
+env.esepro = { -- deffault értékek
+		init=function(fixture) end,
+		time=function(fixture,dt) end,
+		beginContact=function(fixture,b,coll) end,
+		endContact=function(fixture,b,coll) end,
+		preSolve=function(fixture,b,coll) end,
+		postSolve=function(fixture,b,coll,normalimpulse,tangentimpulse) end,
+		delete=function(fixture) end,
+		user=function(...) end
+	}
+env.esemeta = {__index=env.esepro}
 
 local function CoM(coords) -- vissza adja a tömegközépontot, és az eltolási távot
 	local legkx = coords[1]
@@ -74,30 +86,23 @@ local function cutimage(fixture,img,rx,ry,mx,my)  -- rávágja egy formára a k�
 	return padImagedata(imd)
 end
 
-local function udata(fixture,szin,img,ese,rx,ry,mx,my)
+local function udata(fixture,szin,img,ese,rx,ry,mx,my,usd)
 	mx = mx or 0
 	my = my or 0
+	ese = ese or {}
 
-	local esepro = { -- deffault értékek, hogy ha nem definiálja őket az user akkor se bugoljon
-		init=function(fixture) end,
-		time=function(fixture,dt) end,
-		beginContact=function(fixture,b,coll) end,
-		endContact=function(fixture,b,coll) end,
-		preSolve=function(fixture,b,coll) end,
-		postSolve=function(fixture,b,coll,normalimpulse,tangentimpulse) end,
-		user=function(...) end
-	}
-	setmetatable(ese,{__index=esepro})
+	setmetatable(ese,env.esemeta)
 
 	local data = {
 		szin=szin,
 		img=nil,
-		ese=ese,
-		mx=mx,
+		ese=ese,--események
+		mx=mx,--tömeg középpont
 		my=my,
-		rx=rx,
+		rx=rx,--tömegközép-balfelsősarok vektor
 		ry=ry,
-		fixture=fixture
+		fixture=fixture,
+		usd=usd --userdata
 	}
 	if img then 
 		data.img=cutimage(fixture,love.graphics.newImage(img),rx,ry,mx,my) 
@@ -109,11 +114,18 @@ local function udata(fixture,szin,img,ese,rx,ry,mx,my)
 end
 
 
-function env:newPoli(coords,szin,img,dynamic,ese)
+function env:newPoli(coords,szin,img,dynamic,ese,usd)
 
 	if #coords<(2*3) or #coords>(2*8) then return end
 
-	local x,y,rx,ry = CoM(coords)
+	local koords = {}
+
+	for i=1,#coords,2 do
+		koords[i]=coords[i]
+		koords[i+1]=coords[i+1]
+	end
+
+	local x,y,rx,ry = CoM(koords)
 
 	local body 
 	if dynamic then
@@ -121,38 +133,40 @@ function env:newPoli(coords,szin,img,dynamic,ese)
 	else
 		body = love.physics.newBody(self.world, x, y, "kinematic") -- nem befojásolják más objektumok, de mozgatható
 	end
-	local shape = createshape(x,y,coords)-- shape: a coords (0;0) pontja az x,y-on van
+	local shape = createshape(x,y,koords)-- shape: a coords (0;0) pontja az x,y-on van
 	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
 
-	udata(fixture,szin,img,ese,rx,ry)
+	udata(fixture,szin,img,ese,rx,ry,0,0,usd)
 
 
 	return fixture
 	
 end
 
-function env:addPoli(body,coords,szin,img,ese)
+function env:addPoli(body,coords,szin,img,ese,usd)
 
 	if #coords<(2*3) or #coords>(2*8) then return end
 
 	local x,y = body:getPosition()
 
+	local koords = {}
+
 	for i=1,#coords,2 do
-		coords[i]=coords[i]-x
-		coords[i+1]=coords[i+1]-y
+		koords[i]=coords[i]-x
+		koords[i+1]=coords[i+1]-y
 	end
 
 
-	local mx,my,rx,ry = CoM(coords)
-	local shape = love.physics.newPolygonShape(unpack(coords)) 
+	local mx,my,rx,ry = CoM(koords)
+	local shape = love.physics.newPolygonShape(unpack(koords)) 
 	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
 
-	udata(fixture,szin,img,ese,rx,ry,mx,my)
+	udata(fixture,szin,img,ese,rx,ry,mx,my,usd)
 
 	return fixture
 end
 
-function env:newKor(r,x,y,szin,img,dynamic,ese)
+function env:newKor(r,x,y,szin,img,dynamic,ese,usd)
 
 	if r<1 then return end
 
@@ -165,13 +179,13 @@ function env:newKor(r,x,y,szin,img,dynamic,ese)
 	local shape = love.physics.newCircleShape(r)
 	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
 
-	udata(fixture,szin,img,ese,r,r)
+	udata(fixture,szin,img,ese,r,r,0,0,usd)
 
 	return fixture
 	
 end
 
-function env:addKor(body,r,x,y,szin,img,ese)
+function env:addKor(body,r,x,y,szin,img,ese,usd)
 
 	if r<1 then return end
 
@@ -179,14 +193,14 @@ function env:addKor(body,r,x,y,szin,img,ese)
 
 	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
 
-	udata(fixture,szin,img,ese,r,r,x,y)
+	udata(fixture,szin,img,ese,r,r,x,y,usd)
 
 	return fixture
 end
 
 function env:delObj(fixture)
 	if fixture~=nil then
-		local body = self:getObj(ID):getBody()
+		local body = fixture:getBody()
 		if #body:getFixtureList()==1 then -- ha egyetlen forma van csak hozzákapcsolva, az egészet testet törli.
 			body:destroy()
 		else
@@ -217,7 +231,7 @@ function env:draw()
 				love.graphics.setColor(0,0,0,128)
 				love.graphics.circle("line",x,y,radius)
 				love.graphics.setColor(255,255,255,255)
-				love.graphics.draw(data.img,x,y,body:getAngle(),1,1,radius,radius)
+				if data.img then love.graphics.draw(data.img,x,y,body:getAngle(),1,1,radius,radius) end
 					if DEBUG then 
 						local bx,by = body:getPosition()
 						love.graphics.setColor(255,255,255,255)
@@ -232,12 +246,13 @@ function env:draw()
 				love.graphics.polygon("line",points)
 				love.graphics.setColor(255,255,255,255)
 				local x,y = body:getWorldPoints(data.mx,data.my)
-				love.graphics.draw(data.img,x,y,body:getAngle(),1,1,data.rx,data.ry)
+				if data.img then love.graphics.draw(data.img,x,y,body:getAngle(),1,1,data.rx,data.ry) end
 					if DEBUG then 
 						local bx,by = body:getPosition()
 						love.graphics.setColor(255,255,255,255)
 						love.graphics.circle("fill",x,y,5)
 						love.graphics.line(x,y,bx,by)
+						love.graphics.print("	"..data.usd,x,y)
 					end
 			end
 

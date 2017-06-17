@@ -14,11 +14,12 @@ function love.load()
 
 	DEBUG = true
 
-	map:load("w1.lua")
+	map:load("w1.luw")
 
-	map:save("w3.lua")
 
 	canvas = love.graphics.newCanvas(kepernyo.asz,kepernyo.am)
+
+	math.randomseed(os.time())
 
 
 end
@@ -36,14 +37,9 @@ function love.draw()
 	--love.graphics.setCanvas(canvas)
 	kamera:aPos(player.x,player.y)
 	kamera:set()
-		love.graphics.setColor(255,255,255,255)
-		love.graphics.print("Back",0,0)
 
 		env.draw()
-
-		love.graphics.setColor(255,255,255,255)
-		love.graphics.print("Front",100,100)
-
+		player.draw()
 		
 	kamera:unset()
 	love.graphics.setCanvas()
@@ -55,4 +51,13 @@ end
 
 function love.mousepressed(x, y, button, istouch)
 	player.kattintas(x,y,button,istouch)
+end
+
+function love.quit()
+	map:save("w1.luw")
+end
+
+function love.wheelmoved(x,y)
+	if y>0 then kamera:rScale(-0.1) end
+	if y<0 then kamera:rScale(0.1) end
 end

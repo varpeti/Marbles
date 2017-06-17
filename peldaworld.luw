@@ -12,8 +12,9 @@ local w1 = {
 			endContact=function(b,coll) end,							--szétválás
 			preSolve=function(b,coll) end,								--pont ütk elött
 			postSolve=function(b,coll,normalimpulse,tangentimpulse) end,--pont ütk után
-			user=function(...) print(...) end 						--user hívhatja meg, de pl ha a12 ütközik akkor meghívhatja b34-nek ezt a funkcióját.
-		}]]
+			user=function(...) end 										--user hívhatja meg, de pl ha a12 ütközik akkor meghívhatja b34-nek ezt a funkcióját.
+		}]],
+		342321,														--random szám, segítségével megtalálható az objektum (nem id)
 	},
 	{																--objektum
 		2,																--hozzáadás
@@ -29,8 +30,9 @@ local w1 = {
 			preSolve=function(fixture,b,coll) end,
 			postSolve=function(fixture,b,coll,normalimpulse,tangentimpulse) end,
 			user=function(...) end
-		}]]
-	}
+		}]],
+		232748,
+	},
 }
 
 return w1
