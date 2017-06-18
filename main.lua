@@ -8,17 +8,17 @@ map = require('map')
 
 function love.load()
 
-	kepernyo:setmode(1920-192,1080-108,0,true)
+	kepernyo:setmode(0,0,2,true)
 	love.window.setTitle("Marble Race - Váraljai Péter")
 	love.window.setIcon(love.image.newImageData("Data/icon.png"))
+
+	font = love.graphics.newFont(12)
 
 	DEBUG = false
 
 	env.setCallbacks()
 
 	map:load("w1.luw")
-
-	canvas = love.graphics.newCanvas(kepernyo.asz,kepernyo.am)
 
 	math.randomseed(os.time())
 
@@ -28,6 +28,7 @@ end
 function love.update(dt)
 	player:mozgas(dt)
 	env:update(dt)
+	marbles.update(dt)
 
 	if love.keyboard.isDown("escape") then
 		love.event.quit()
@@ -35,7 +36,7 @@ function love.update(dt)
 end
 
 function love.draw()
-	--love.graphics.setCanvas(canvas)
+
 	kamera:aPos(player.x,player.y)
 	kamera:set()
 
@@ -43,11 +44,8 @@ function love.draw()
 		player.draw()
 		
 	kamera:unset()
-	love.graphics.setCanvas()
 
-	love.graphics.draw(canvas)
-
-	love.graphics.print("HUD",10,10)
+	marbles.hud()
 end
 
 function love.quit()
@@ -63,8 +61,6 @@ function love.wheelmoved(x,y)
 	if y<0 then kamera:rScale(0.1) end
 end
 
-function love.keypressed(key, scancode, isrepeat )
-	if key=="space" then
-		marbles.start()
-	end
+function love.keypressed(key, scancode, isrepeat)
+	player.billentyu(key, scancode, isrepeat)
 end

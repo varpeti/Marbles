@@ -12,6 +12,10 @@ function map:load(file)
 	end
 	map.world = loadfile(file)()
 
+	map.init()
+end
+
+function map.init()
 	for i,obj in ipairs(map.world) do
 		if obj[1]==2 then -- Hozzáadás az előző testhez
 			if map.lastbody==nil then return end
@@ -32,7 +36,6 @@ function map:load(file)
 
 		end
 	end
-	
 end
 
 function map:save(filename)
@@ -64,6 +67,15 @@ function map:delObj(name)
 	for i,obj in pairs(self.world) do
 		if obj[7]==name then
 			table.remove(self.world,i)
+			return
+		end
+	end
+end
+
+function map:setObj(name,ese)
+	for i,obj in pairs(self.world) do
+		if obj[7]==name then
+			obj[6]=ese
 			return
 		end
 	end

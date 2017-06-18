@@ -1,6 +1,6 @@
 local env = {}
 
-env.world = love.physics.newWorld(0, 600, true)
+env.world = love.physics.newWorld(0, 900, true)
 
 --[[
 	data t
@@ -206,11 +206,9 @@ function env:delObj(fixture)
 			fixture:destroy()
 		end
 	else -- teljes törlés ha nincs paraméter
-		for i=1, env.IDs do
-			local fixture = env:getObj(i)
-			if fixture~=nil then fixture:getBody():destroy() end
+		for b,body in ipairs(env.world:getBodyList()) do
+			body:destroy()
 		end
-		env.IDs=0
 	end
 
 end
@@ -223,6 +221,7 @@ function env:draw()
 			local data = fixture:getUserData()
 	
 			if (shapeType == "circle") then
+
 				local x,y = body:getWorldPoint(shape:getPoint())
 				local radius = shape:getRadius()
 				love.graphics.setColor(data.szin[1],data.szin[2],data.szin[3],255)
@@ -231,10 +230,13 @@ function env:draw()
 				love.graphics.circle("line",x,y,radius)
 				love.graphics.setColor(255,255,255,255)
 				if data.img then love.graphics.draw(data.img,x,y,body:getAngle(),1,1,radius,radius) end
-					local bd = body:getUserData() if bd then body:setPosition(bd[1],bd[2]) body:setUserData(nil) end
+
+						--love.graphics.setColor(255-data.szin[1],255-data.szin[2],255-data.szin[3],255)
+						--if data.usd then love.graphics.print(data.usd,x,y,body:getAngle(),1,1,font:getWidth(data.usd)/2,font:getHeight()/2) end
+
 			elseif (shapeType == "polygon") then
 				local points = {body:getWorldPoints(shape:getPoints())}
-				love.graphics.setColor(data.szin[1],data.szin[2],data.szin[3],122)
+				love.graphics.setColor(data.szin[1],data.szin[2],data.szin[3],180)
 				love.graphics.polygon("fill",points)
 				love.graphics.setColor(0,0,0,128)
 				love.graphics.polygon("line",points)
