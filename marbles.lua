@@ -10,7 +10,7 @@ function marbles.start()
 		{"Greed",		{255,255,000},	nil},
 		{"Sloth",		{000,200,200},	nil},
 		{"Gluttony",	{200,100,000},	nil},
-		{"Envy",		{100,200,000},	nil},
+		{"Envy",		{100,200,000},	"Data/envy1.png"},
 		{"Pride",		{100,000,200},	nil},
 	}
 
