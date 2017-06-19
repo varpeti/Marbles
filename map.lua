@@ -2,7 +2,6 @@ ser = require('ser')
 
 local map = {}
 map.world = {}
-map.lastbody={}
 
 
 function map:load(file)
@@ -16,24 +15,33 @@ function map:load(file)
 end
 
 function map.init()
-	for i,obj in ipairs(map.world) do
-		if obj[1]==2 then -- Hozzáadás az előző testhez
-			if map.lastbody==nil then return end
-
-			if obj[2]==0 then --polygnom
-				env:addPoli(map.lastbody,obj[3],obj[4],obj[5],loadstring(obj[6])(),obj[7])
-			elseif obj[2]==1 then --kör
-				env:addKor(map.lastbody,obj[3][1],obj[3][2],obj[3][3],obj[4],obj[5],loadstring(obj[6])(),obj[7])
+	for ib,b in ipairs(map.world) do
+		local body
+		for is,s in ipairs(b.sha) do
+			if body then 
+				env:addPoli(body,s.cor,s.col,s.img,loadstring(s.ese)(),s.nev)
+			else
+				body = env:newPoli(s.cor,s.col,s.img,b.dyn,loadstring(s.ese)(),s.nev):getBody()
 			end
-
-		else -- Új test
-
-			if obj[2]==0 then --polygnom
-				map.lastbody = env:newPoli(obj[3],obj[4],obj[5],obj[1]==1,loadstring(obj[6])(),obj[7]):getBody()
-			elseif obj[2]==1 then --kör
-				map.lastbody = env:newKor(obj[3][1],obj[3][2],obj[3][3],obj[4],obj[5],obj[1]==1,loadstring(obj[6])(),obj[7]):getBody()
+		end
+	end
+	for ib,b in ipairs(map.world) do
+		if b.joa then
+			local b1,b2
+			for k,body in ipairs(env.world:getBodyList()) do
+				for f,fixture in ipairs(body:getFixtureList()) do
+					if fixture:getUserData().usd==b.joa[1] then
+						b1=body
+					end
+					if fixture:getUserData().usd==b.joa[2] then
+						b2=body
+					end
+				end
 			end
-
+			if b1==nil or b2==nil then table.remove(map.world,ib) return end
+			local x1,y1 = b1:getPosition()
+			local x2,y2 = b2:getPosition()
+			love.physics.newRopeJoint(b1,b2,x1,y1,x2,y2,math.sqrt((x1-x2)^2+(y1-y2)^2,2),false)
 		end
 	end
 end
@@ -43,44 +51,91 @@ function map:save(filename)
 	file:write(ser(map.world))
 end
 
-function map:addObj(coords,szin,name)
-
-	local ok
+local function nevok(nev)
+	local ok = true
 	repeat
-		ok = true
-		for i,obj in pairs(self.world) do
-			if obj[7]==name then
-				name=name+1
+	for ib,b2 in ipairs(map.world) do
+		for is,s2 in ipairs(b2.sha) do
+			if s2.nev==nev then
+				s.nev=nev+1
 				ok=false
-				break
 			end
 		end
-	until(ok)
-	
+	end
+	until (ok)
+	return nev
+end
 
-	table.insert(self.world,{0,0,coords,szin,nil,"return {}",name})
+function map:newObj(b)
+	local s = b.sha[1]
 
-	return name
+	s.nev=nevok(s.nev)
+
+	env:newPoli(s.cor,s.col,s.img,b.dyn,loadstring(s.ese)(),s.nev)
+
+	local b2={
+		dyn=b.dyn,
+		sha={b.sha[1]},
+	}
+
+	table.insert(self.world,b2)
+end
+
+function map:addObj(fix,s)
+	s.nev=nevok(s.nev)
+	env:addPoli(fix:getBody(),s.cor,s.col,s.img,loadstring(s.ese)(),s.nev)
+
+	local name=fix:getUserData().usd
+
+	for ib,b in pairs(self.world) do
+		for is,s2 in ipairs(b.sha) do
+			if s2.nev==name then
+				table.insert(b.sha,s)
+			end
+		end
+	end
 end
 
 function map:delObj(name)
-	for i,obj in pairs(self.world) do
-		if obj[7]==name then
-			table.remove(self.world,i)
-			return
+	print("d",name)
+	for ib,b in pairs(self.world) do
+		for is,s in ipairs(b.sha) do
+			if s.nev==name then
+				table.remove(self.world,ib)
+				return
+			end
 		end
 	end
 end
 
 function map:setObj(name,ese)
-	for i,obj in pairs(self.world) do
-		if obj[7]==name then
-			obj[6]=ese
-			return
+	for ib,b in pairs(self.world) do
+		for is,s in ipairs(b.sha) do
+			if s.nev==name then
+				s.ese=ese
+				return
+			end
 		end
 	end
 end
 
+function map:setDyn(name)
+	for ib,b in pairs(self.world) do
+		for is,s in ipairs(b.sha) do
+			if s.nev==name then
+				b.dyn=not b.dyn
+				return
+			end
+		end
+	end
+end
+
+function map:addJoint(fix1,fix2)
+
+	table.insert(map.world,{joa={fix1:getUserData().usd,fix2:getUserData().usd},sha={}})
+
+	env:delObj() map.init() marbles.beert={} -- resetel rakja be
+end
 
 
 return map

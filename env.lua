@@ -226,24 +226,19 @@ function env:draw()
 				local radius = shape:getRadius()
 				love.graphics.setColor(data.szin[1],data.szin[2],data.szin[3],255)
 				love.graphics.circle("fill",x,y,radius)
-				love.graphics.setColor(0,0,0,128)
-				love.graphics.circle("line",x,y,radius)
 				love.graphics.setColor(255,255,255,255)
 				if data.img then love.graphics.draw(data.img,x,y,body:getAngle(),1,1,radius,radius) end
-
-						--love.graphics.setColor(255-data.szin[1],255-data.szin[2],255-data.szin[3],255)
-						--if data.usd then love.graphics.print(data.usd,x,y,body:getAngle(),1,1,font:getWidth(data.usd)/2,font:getHeight()/2) end
 
 			elseif (shapeType == "polygon") then
 				local points = {body:getWorldPoints(shape:getPoints())}
 				love.graphics.setColor(data.szin[1],data.szin[2],data.szin[3],180)
 				love.graphics.polygon("fill",points)
-				love.graphics.setColor(0,0,0,128)
+				love.graphics.setColor(0,0,0,255)
 				love.graphics.polygon("line",points)
 				love.graphics.setColor(255,255,255,255)
 				local x,y = body:getWorldPoints(data.mx,data.my)
 				if data.img then love.graphics.draw(data.img,x,y,body:getAngle(),1,1,data.rx,data.ry) end
-					if true or DEBUG then 
+					if DEBUG then 
 						local bx,by = body:getPosition()
 						love.graphics.setColor(255,255,255,255)
 						love.graphics.circle("fill",x,y,5)
@@ -253,14 +248,21 @@ function env:draw()
 
 		end
 
-		if DEBUG then
+		--[[if DEBUG then
 			love.graphics.setColor(255,255,255,255)
 			local x,y = body:getPosition()
 			love.graphics.circle("line",x,y,9)
 			x,y = body:getWorldCenter()
 			love.graphics.circle("line",x,y,7)
-		end
+		end]]
 	end	
+	if DEBUG then
+		love.graphics.setColor(255,255,255,255)
+		for j,joint in pairs(env.world:getJointList()) do
+			local x1, y1, x2, y2 = joint:getAnchors()
+				love.graphics.line(x1,y1,x2,y2)
+		end
+	end
 end
 
 function env:update(dt)

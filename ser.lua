@@ -5,19 +5,21 @@ local function serialize(o)
 		if type(o) == "number" then
 			ki=ki..o
 		elseif type(o) == "string" then
-			if o:find("return") then
-				ki=ki.."\n"..string.format("%q", o).."\n"
-			else
-				ki=ki..string.format("%q", o)
-			end
+			ki=ki.."\n[["..o.."]]"
 		elseif type(o) == "table" then
-			ki=ki.."{"
+			ki=ki.."\n{"
 			for k,v in pairs(o) do
-				ki=ki.."["..k.."]".."="
+				if type(k) == "number" then
+					ki=ki.."["..k.."]".."="
+				else
+					ki=ki..k.."="
+				end
 				ser(v,ki)
 				ki=ki..","
 			end
 			ki=ki.."}"
+		elseif type(o) == "boolean" then
+			if o then ki=ki.."true" else ki=ki.."false" end
 		else
 			ki=ki..type(o)
 		end

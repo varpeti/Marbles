@@ -36,9 +36,18 @@ local player = {
 							table.insert(coords,pont.y)
 						end
 						local rr,gg,bb = math.random(0,255),math.random(0,255),math.random(0,255)
-						local name = math.random(0,9e9)
-						name = map:addObj(coords,{rr,gg,bb},name)
-						env:newPoli(coords,{rr,gg,bb},nil,false,nil,name)
+						local s = {
+								cor=coords,
+								col={rr,gg,bb},
+								img=nil,
+								ese=[[return {}]],
+								nev=math.random(0,9e9),
+							}
+						if kijelolve then 
+							map:addObj(kijelolve,s)
+						else
+							map:newObj({dyn=false,sha={s}})
+						end
 					end
 					player.pontok={};
 				else
@@ -49,13 +58,20 @@ local player = {
 			elseif button==2 then
 				for b,body in ipairs(env.world:getBodyList()) do
 					for f,fixture in ipairs(body:getFixtureList()) do
-						if fixture:testPoint(x,y) then 
+						if fixture:testPoint(x,y) then
+							if kijelolve==fixture then print(fixture:getUserData().usd) return end
+							if kijelolve and kijelolve:getBody():getType()=="dynamic" then
+								map:addJoint(kijelolve,fixture)
+								kijelolve=nil
+								return
+							end
 							kijelolve=fixture
 							print(fixture:getUserData().usd)
 							return
 						end
 					end
 				end
+				kijelolve=nil
 			elseif button==3 then
 				env:newKor(30,x,y,{255,255,255},nil,true,nil,"Ghost")
 			elseif button==4 then
@@ -89,39 +105,33 @@ local player = {
 	billentyu=function(key, scancode, isrepeat)
 			if key=="space" then
 				marbles.start()
-			elseif key=="r" then
-				marbles.beert={}
-				env:delObj()
-				map.init()
-				kijelolve=nil
 			end
-	
+
 			if kijelolve then
 				if key=="e" then
 					env:delObj(kijelolve)
-				elseif key=="t" then
+					kijelolve=nil
+					return
+				elseif key=="q" then
 					map:delObj(kijelolve:getUserData().usd)
-					env:delObj(kijelolve)
+				elseif key=="r" then
+					map:setObj(kijelolve:getUserData().usd,[[return {init=function(fixture) fixture:getBody():setAngularVelocity(2.34567) end}]])
+				elseif key=="t" then
+					map:setObj(kijelolve:getUserData().usd,[[return {beginContact=function(fixture,b,coll) b:getBody():applyLinearImpulse(0,-6.54e3) end}]])
 				elseif key=="z" then
-					map:setObj(kijelolve:getUserData().usd,[[return {init=function(fixture) fixture:getBody():setAngularVelocity(7) end}]])
-					kijelolve:getBody():setAngularVelocity(7)
-				elseif key=="u" then
-					map:setObj(kijelolve:getUserData().usd,[[return {beginContact=function(fixture,b,coll) b:getBody():applyLinearImpulse(0,-1e4) end}]])
-					env:delObj() map.init()
-				elseif key=="i" then
-					x, y = kijelolve:getBody():getPosition()
+					local x, y = kijelolve:getBody():getPosition()
 					map:setObj(kijelolve:getUserData().usd,[[return {
 						init=function(fixture) fixture:getBody():setLinearVelocity(0,-100) end, 
 						time=function(fixture,dt) if os.time()%5==0 then fixture:getBody():setUserData({'pos',]]..x..[[,]]..y..[[}) end end}]])
-					env:delObj() map.init()
-				elseif key=="o" then
+				elseif key=="u" then
 					map:setObj(kijelolve:getUserData().usd,[[return {beginContact=function(fixture,b,coll) b:getBody():setUserData({'pos',0,0}) end}]])
-					env:delObj() map.init()
+				elseif key=="i" then
+					map:setDyn(kijelolve:getUserData().usd)
 				elseif key=="p" then
 					map:setObj(kijelolve:getUserData().usd,[[return {beginContact=function(fixture,b,coll) b:getBody():setUserData({'cel'}) end}]])
-					env:delObj() map.init()
 				end
 				kijelolve=nil
+				env:delObj() map.init() marbles.beert={}
 			end
 		end,
 	}

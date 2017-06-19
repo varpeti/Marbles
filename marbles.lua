@@ -5,7 +5,7 @@ marbles.beert = {}
 function marbles.start()
 
 	local colors = {
-		{"Wrath",		{255,000,000},	nil},
+		{"Wrath",		{255,000,000},	"Data/wrath2.png"},
 		{"Lust",		{000,000,255},	nil},
 		{"Greed",		{255,255,000},	nil},
 		{"Sloth",		{000,200,200},	nil},
@@ -19,7 +19,7 @@ function marbles.start()
 		local s = math.random(0,math.pi*2)
 		local r = math.random(0,245)
 
-		env:newKor(30,math.cos(s)*r,math.sin(s)*r,color[2],nil,true,color[3],color[1]):getBody():setLinearVelocity(math.cos(s)*r*-10,-1000)
+		env:newKor(30,math.cos(s)*r,math.sin(s)*r,color[2],color[3],true,nil,color[1]):getBody():setLinearVelocity(math.cos(s)*r*-10,-1000)
 	end
 end
 
@@ -27,7 +27,7 @@ function marbles.update(dt)
 	for b,body in ipairs(env.world:getBodyList()) do
 		for f,fixture in ipairs(body:getFixtureList()) do
 			local shape = fixture:getShape()
-			local shapeType = shape:getType()
+			if shape:getType()~="circle" then break end
 			local data = fixture:getUserData()
 	
 			local bd = body:getUserData() 

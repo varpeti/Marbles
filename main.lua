@@ -14,7 +14,7 @@ function love.load()
 
 	font = love.graphics.newFont(12)
 
-	DEBUG = false
+	DEBUG = true
 
 	env.setCallbacks()
 
@@ -57,8 +57,8 @@ function love.mousepressed(x, y, button, istouch)
 end
 
 function love.wheelmoved(x,y)
-	if y>0 then kamera:rScale(-0.1) end
-	if y<0 then kamera:rScale(0.1) end
+	if y>0 then kamera:rScale(-0.05) end
+	if y<0 then kamera:rScale(0.05) end
 end
 
 function love.keypressed(key, scancode, isrepeat)
