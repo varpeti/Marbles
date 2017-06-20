@@ -57,8 +57,8 @@ function love.mousepressed(x, y, button, istouch)
 end
 
 function love.wheelmoved(x,y)
-	if y>0 then kamera:rScale(-0.05) end
-	if y<0 then kamera:rScale(0.05) end
+	if y>0 then kamera:rScale(-0.0125) end
+	if y<0 then kamera:rScale(0.0125) end
 end
 
 function love.keypressed(key, scancode, isrepeat)

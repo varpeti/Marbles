@@ -38,10 +38,11 @@ function map.init()
 					end
 				end
 			end
-			if b1==nil or b2==nil then table.remove(map.world,ib) return end
-			local x1,y1 = b1:getPosition()
-			local x2,y2 = b2:getPosition()
-			love.physics.newRopeJoint(b1,b2,x1,y1,x2,y2,math.sqrt((x1-x2)^2+(y1-y2)^2,2),false)
+			if b1==nil or b2==nil then table.remove(map.world,ib) else
+				local x1,y1 = b1:getPosition()
+				local x2,y2 = b2:getPosition()
+				love.physics.newRopeJoint(b1,b2,x1,y1,x2,y2,math.sqrt((x1-x2)^2+(y1-y2)^2,2),false)
+			end
 		end
 	end
 end
@@ -97,7 +98,6 @@ function map:addObj(fix,s)
 end
 
 function map:delObj(name)
-	print("d",name)
 	for ib,b in pairs(self.world) do
 		for is,s in ipairs(b.sha) do
 			if s.nev==name then

@@ -1,7 +1,7 @@
 local player = {
 	x=0,
 	y=0,
-	speed=700,
+	speed=500,
 	mozgas=function(self,dt)
 			if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
 					self.x = self.x + (self.speed*dt)
@@ -85,6 +85,11 @@ local player = {
 						end
 					end
 				end
+			
+			elseif button==5 then
+				for i=1,7 do
+					env:newKor(30,x,y,{255,255,255},nil,true,nil,"Ghost")
+				end
 			end
 		end,
 	draw=function()
@@ -127,8 +132,19 @@ local player = {
 					map:setObj(kijelolve:getUserData().usd,[[return {beginContact=function(fixture,b,coll) b:getBody():setUserData({'pos',0,0}) end}]])
 				elseif key=="i" then
 					map:setDyn(kijelolve:getUserData().usd)
+				elseif key=="o" then
+					map:setObj(kijelolve:getUserData().usd,[[return {}]])
 				elseif key=="p" then
 					map:setObj(kijelolve:getUserData().usd,[[return {beginContact=function(fixture,b,coll) b:getBody():setUserData({'cel'}) end}]])
+				elseif key=="f" then
+					local x, y = kijelolve:getBody():getPosition()
+					map:setObj(kijelolve:getUserData().usd,[[return {
+						beginContact=function(fixture,b,coll) 
+							local x,y = b:getBody():getPosition()
+							local nx,ny = coll:getNormal()					
+							b:getBody():setUserData({'pos',x-nx,y-ny})
+						end,
+						}]])
 				end
 				kijelolve=nil
 				env:delObj() map.init() marbles.beert={}
