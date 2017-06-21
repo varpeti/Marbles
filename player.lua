@@ -140,9 +140,11 @@ local player = {
 					local x, y = kijelolve:getBody():getPosition()
 					map:setObj(kijelolve:getUserData().usd,[[return {
 						beginContact=function(fixture,b,coll) 
-							local x,y = b:getBody():getPosition()
-							local nx,ny = coll:getNormal()					
-							b:getBody():setUserData({'pos',x-nx,y-ny})
+							local x1,y1 = b:getBody():getPosition()
+							local x2,y2 = fixture:getBody():getPosition()
+							if y1>y2 then		
+								b:getBody():setUserData({'pos',x1,y2-(y1-y2)})
+							end
 						end,
 						}]])
 				end

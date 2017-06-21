@@ -7,11 +7,11 @@ function marbles.start()
 	local colors = {
 		{"Wrath",		{255,000,000},	"Data/wrath.png"},
 		{"Lust",		{000,000,255},	"Data/lust.png"	},
-		{"Greed",		{255,255,000},	nil},
+		{"Greed",		{255,255,000},	"Data/greed.png"},
 		{"Sloth",		{000,200,200},	nil},
 		{"Gluttony",	{200,100,000},	nil},
 		{"Envy",		{100,200,000},	"Data/envy.png"	},
-		{"Pride",		{100,000,200},	nil},
+		{"Pride",		{100,000,200},	"Data/pride.png"},
 	}
 
 
@@ -56,10 +56,17 @@ end
 function marbles.hud()
 	for i,be in ipairs(marbles.beert) do
 		love.graphics.setColor(be[2][1],be[2][2],be[2][3],255)
-		local x,y = i*35*2-35,35
+
+		local x,y = i*35*2-35, 35
+		local mkep = math.floor(kepernyo.Asz/35)*35
+		local tul = math.floor(x/mkep)
+		x = x-(mkep)*tul
+		y = y+2*40*tul
+
 		love.graphics.circle("fill",x,y,30)
 		love.graphics.setColor(255,255,255,255)
 		if be[1] then love.graphics.print(be[1],x,y+50,0,1,1,font:getWidth(be[1])/2,font:getHeight()) end
+		if be[3] then love.graphics.draw(be[3],x,y,0,1,1,30,30) end
 	end
 end
 
