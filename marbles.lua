@@ -31,7 +31,11 @@ function marbles.update(dt)
 	
 			local bd = body:getUserData() 
 			if bd then
-				if bd[1]=="pos" then body:setPosition(bd[2],bd[3]) end
+				if bd[1]=="pos" then 
+					body:setPosition(bd[2],bd[3]) 
+				elseif bd[1]=="ghost" then 
+					env:newKor(30,bd[2],bd[3],{255,255,255},nil,true,nil,"Ghost")
+				end
 				body:setUserData(nil)
 			end
 
@@ -41,7 +45,7 @@ function marbles.update(dt)
 					if bd[1]=="del" then env:delObj(fixture)
 					elseif bd[1]=="cel" then 
 						table.insert(marbles.beert,{data.usd,data.szin,data.img})
-						env:delObj(fixture) 
+						env:delObj(fixture)
 					end
 				end
 

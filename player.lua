@@ -147,6 +147,14 @@ local player = {
 							end
 						end,
 						}]])
+				elseif key=="g" then
+					map:setObj(kijelolve:getUserData().usd,[[return {
+						endContact=function(fixture,b,coll)
+							if b:getShape():getType()=="circle" and b:getUserData().usd~="Ghost" then
+								fixture:getBody():setUserData({'ghost',0,0})
+							end
+						end,
+						}]])
 				end
 				kijelolve=nil
 				env:delObj() map.init() marbles.beert={}
