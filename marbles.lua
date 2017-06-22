@@ -35,6 +35,8 @@ function marbles.update(dt)
 					body:setPosition(bd[2],bd[3]) 
 				elseif bd[1]=="ghost" then 
 					env:newKor(30,bd[2],bd[3],{255,255,255},nil,true,nil,"Ghost")
+				elseif bd[1]=="d2" then
+					env:newKor(30,bd[3],bd[4],bd[2].szin,bd[2].img:getData(),true,nil,bd[2].usd)
 				end
 				body:setUserData(nil)
 			end
@@ -44,8 +46,18 @@ function marbles.update(dt)
 				if bd then 
 					if bd[1]=="del" then env:delObj(fixture)
 					elseif bd[1]=="cel" then 
+						local nev = data.usd
 						table.insert(marbles.beert,{data.usd,data.szin,data.img})
 						env:delObj(fixture)
+
+						if player.csakegy then
+							for bi,b2 in ipairs(env.world:getBodyList()) do
+								if b2:getFixtureList()[1]:getUserData().usd==nev then
+									b2:setUserData({"del"}) -- a többi is törli ha egy beért
+								end
+							end
+						end
+
 					end
 				end
 

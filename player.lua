@@ -151,6 +151,8 @@ local player = {
 				marbles.start()
 			elseif key=="m" then
 				player.kamlock= not player.kamlock
+			elseif key=="n" then
+				player.csakegy= not player.csakegy
 			end
 
 			if kijelolve then
@@ -196,11 +198,20 @@ local player = {
 							end
 						end,
 						}]])
+				elseif key=="h" then
+					map:setObj(kijelolve:getUserData().usd,[[return {
+						endContact=function(fixture,b,coll)
+							if b:getShape():getType()=="circle" and b:getUserData().usd~="Ghost" then
+								fixture:getBody():setUserData({'d2',b:getUserData(),0,0})
+							end
+						end,
+						}]])
 				end
 				kijelolve=nil
 				env:delObj() map.init() marbles.beert={}
 			end
 		end,
+		csakegy=false,
 	}
 
 return player
