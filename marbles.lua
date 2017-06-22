@@ -8,8 +8,8 @@ function marbles.start()
 		{"Wrath",		{255,000,000},	"Data/wrath.png"},
 		{"Lust",		{000,000,255},	"Data/lust.png"	},
 		{"Greed",		{255,255,000},	"Data/greed.png"},
-		{"Sloth",		{000,200,200},	nil},
-		{"Gluttony",	{200,100,000},	nil},
+		{"Sloth",		{000,200,200},	"Data/sloth.png"},
+		{"Gluttony",	{200,100,000},	"Data/gluttony.png"},
 		{"Envy",		{100,200,000},	"Data/envy.png"	},
 		{"Pride",		{100,000,200},	"Data/pride.png"},
 	}

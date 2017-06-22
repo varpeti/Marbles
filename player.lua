@@ -2,6 +2,8 @@ local player = {
 	x=0,
 	y=0,
 	speed=500,
+	--vonal={Wrath={},Lust={},Greed={},Sloth={},Gluttony={},Envy={},Pride={}},
+	--counter=0,
 	mozgas=function(self,dt)
 			if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
 					self.x = self.x + (self.speed*dt)
@@ -14,6 +16,28 @@ local player = {
 			end
 			if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
 					self.y = self.y - (self.speed*dt)
+			end
+			if player.kamlock then 
+				local min = {0,0}
+				local avg = {0,0,0}
+				local vok = false
+				--player.counter=player.counter+dt if player.counter>0.5 then player.counter=player.counter-0.5 vok=true end
+				for b,body in ipairs(env.world:getBodyList()) do
+					if body:getFixtureList()[1]:getShape():getType()=="circle" then
+						local x,y = body:getPosition()
+						--if vok then table.insert(player.vonal[body:getFixtureList()[1]:getUserData().usd],{x,y}) end
+						avg = {avg[1]+x,avg[2]+y,avg[3]+1}
+						if min[2]<y then 
+							min = {x,y}
+						end
+					end
+				end
+				avg = {avg[1]/avg[3],avg[2]/avg[3]}
+				local v = --{avg[1]-self.x,avg[2]-self.y}
+						{min[1]-self.x,min[2]-self.y}
+				local tav = 15--(v[1]^2+v[2]^2)^(1/2)
+				self.x=self.x+(v[1])/tav
+				self.y=self.y+(v[2])/tav
 			end
 		end,
 	pontok={},
@@ -59,7 +83,7 @@ local player = {
 				for b,body in ipairs(env.world:getBodyList()) do
 					for f,fixture in ipairs(body:getFixtureList()) do
 						if fixture:testPoint(x,y) then
-							if kijelolve==fixture then print(fixture:getUserData().usd) return end
+							if kijelolve~=nil and kijelolve:getBody()==fixture:getBody() then print(fixture:getUserData().usd) return end
 							if kijelolve and kijelolve:getBody():getType()=="dynamic" then
 								map:addJoint(kijelolve,fixture)
 								kijelolve=nil
@@ -92,6 +116,7 @@ local player = {
 				end
 			end
 		end,
+	kamlock=false,
 	draw=function()
 			if player.pontok then 
 				love.graphics.setColor(255,255,255,255)
@@ -106,10 +131,26 @@ local player = {
 				local x,y = kijelolve:getBody():getPosition()
 				love.graphics.circle("line",x,y,10)
 			end
+			--[[for name,sin in pairs(player.vonal) do
+				if name=="Wrath" 		then		love.graphics.setColor(255,000,000)
+				elseif name=="Lust" 	then		love.graphics.setColor(000,000,255)
+				elseif name=="Greed" 	then		love.graphics.setColor(255,255,000)
+				elseif name=="Sloth" 	then		love.graphics.setColor(000,200,200)
+				elseif name=="Gluttony" then		love.graphics.setColor(200,100,000)
+				elseif name=="Envy" 	then		love.graphics.setColor(100,200,000)
+				elseif name=="Pride" 	then		love.graphics.setColor(100,000,200) end
+				local e={0,0}
+				for i,xy in ipairs(sin) do
+					love.graphics.line(e[1],e[2],xy[1],xy[2])
+					e=xy
+				end
+			end]]
 		end,
 	billentyu=function(key, scancode, isrepeat)
 			if key=="space" then
 				marbles.start()
+			elseif key=="m" then
+				player.kamlock= not player.kamlock
 			end
 
 			if kijelolve then
