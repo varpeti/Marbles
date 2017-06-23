@@ -2,7 +2,7 @@ local marbles = {}
 
 marbles.beert = {}
 
-function marbles.start()
+function marbles.start() -- idítás
 
 	local colors = {
 		{"Wrath",		{255,000,000},	"Data/wrath.png"},
@@ -17,13 +17,13 @@ function marbles.start()
 
 	for i,color in ipairs(colors) do
 		local s = math.random(0,math.pi*2)
-		local r = math.random(0,245)
+		local r = math.random(0,225)
 
 		env:newKor(30,math.cos(s)*r,math.sin(s)*r,color[2],color[3],true,nil,color[1]):getBody():setLinearVelocity(math.cos(s)*r*-10,-1000)
 	end
 end
 
-function marbles.update(dt)
+function marbles.update(dt) --végig megy az objektumokonkon és ahol van body user data ott aszerint jár el
 	for b,body in ipairs(env.world:getBodyList()) do
 		for f,fixture in ipairs(body:getFixtureList()) do
 			local shape = fixture:getShape()
@@ -31,26 +31,26 @@ function marbles.update(dt)
 	
 			local bd = body:getUserData() 
 			if bd then
-				if bd[1]=="pos" then 
+				if bd[1]=="pos" then --teleport
 					body:setPosition(bd[2],bd[3]) 
-				elseif bd[1]=="ghost" then 
+				elseif bd[1]=="ghost" then -- szellem idézés
 					env:newKor(30,bd[2],bd[3],{255,255,255},nil,true,nil,"Ghost")
-				elseif bd[1]=="d2" then
+				elseif bd[1]=="d2" then -- duplázás
 					env:newKor(30,bd[3],bd[4],bd[2].szin,bd[2].img:getData(),true,nil,bd[2].usd)
 				end
 				body:setUserData(nil)
 			end
 
-			if shape:getType()=="circle" then 
+			if shape:getType()=="circle" then -- Golyónak kell lenni hogy ezek teljesüljenek
 
 				if bd then 
-					if bd[1]=="del" then env:delObj(fixture)
-					elseif bd[1]=="cel" then 
+					if bd[1]=="del" then env:delObj(fixture) -- törlés
+					elseif bd[1]=="cel" then -- célbaérkezés
 						local nev = data.usd
 						table.insert(marbles.beert,{data.usd,data.szin,data.img})
 						env:delObj(fixture)
 
-						if player.csakegy then
+						if player.csakegy then -- ha bevan állítva a csakegy törlésre jelöli a többit is
 							for bi,b2 in ipairs(env.world:getBodyList()) do
 								if b2:getFixtureList()[1]:getUserData().usd==nev then
 									b2:setUserData({"del"}) -- a többi is törli ha egy beért
