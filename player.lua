@@ -15,12 +15,11 @@ local player = {
 			if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
 					self.y = self.y - (self.speed*dt)
 			end
-			if player.kamlock then -- ha kameralock, akkor itt számolja
+			if player.kamlock==1 then
 				local min = {0,0}
 				for b,body in ipairs(env.world:getBodyList()) do
 					if body:getFixtureList()[1]:getShape():getType()=="circle" then -- ha golyó
 						local x,y = body:getPosition()
-						avg = {avg[1]+x,avg[2]+y,avg[3]+1}
 						if min[2]<y then --minimum kiválasztás
 							min = {x,y}
 						end
@@ -28,6 +27,20 @@ local player = {
 				end
 				local v ={min[1]-self.x,min[2]-self.y} --vektorképzés
 				local tav = 15--(v[1]^2+v[2]^2)^(1/2) --10-15 körül jó
+				self.x=self.x+(v[1])/tav
+				self.y=self.y+(v[2])/tav
+
+			elseif player.kamlock==2 then
+				local avg = {0,0,0}
+				for b,body in ipairs(env.world:getBodyList()) do
+					if body:getFixtureList()[1]:getShape():getType()=="circle" then -- ha golyó
+						local x,y = body:getPosition()
+						avg={avg[1]+x,avg[2]+y,avg[3]+1}
+					end
+				end
+				if avg[3]==0 then return end
+				local v ={avg[1]/avg[3]-self.x,avg[2]/avg[3]-self.y}
+				local tav=20
 				self.x=self.x+(v[1])/tav
 				self.y=self.y+(v[2])/tav
 			end
@@ -110,7 +123,7 @@ local player = {
 				end
 			end
 		end,
-	kamlock=false,
+	kamlock=0,
 	draw=function()
 			if player.pontok then -- építő pontok kirajzolása, koordinátákkal
 				love.graphics.setColor(255,255,255,255)
@@ -130,7 +143,8 @@ local player = {
 			if key=="space" then -- start
 				marbles.start()
 			elseif key=="m" then -- kamlock
-				player.kamlock= not player.kamlock
+				player.kamlock=player.kamlock+1
+				if player.kamlock==3 then player.kamlock=0 end
 			elseif key=="n" then -- egy bemegy a többi ugyan olyan eltünik
 				player.csakegy= not player.csakegy
 			end

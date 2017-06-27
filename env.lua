@@ -242,7 +242,7 @@ function env:draw()
 						local bx,by = body:getPosition()
 						love.graphics.setColor(255,255,255,255)
 						love.graphics.circle("fill",x,y,5)
-						love.graphics.line(x,y,bx,by)
+						--love.graphics.line(x,y,bx,by)
 					end
 			end
 

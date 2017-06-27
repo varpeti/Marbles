@@ -36,7 +36,13 @@ function marbles.update(dt) --végig megy az objektumokonkon és ahol van body u
 				elseif bd[1]=="ghost" then -- szellem idézés
 					env:newKor(30,bd[2],bd[3],{255,255,255},nil,true,nil,"Ghost")
 				elseif bd[1]=="d2" then -- duplázás
-					env:newKor(30,bd[3],bd[4],bd[2].szin,bd[2].img:getData(),true,nil,bd[2].usd)
+					local mehet = true
+					if player.csakegy then -- Ha csak-egy mód van
+						for i,be in pairs(marbles.beert) do -- és már beért (nevük egyezik)
+							if be[1]==bd[2].usd then  mehet=false break end -- akkor nem hoz létre 
+						end
+					end
+					if mehet then env:newKor(30,bd[3],bd[4],bd[2].szin,bd[2].img:getData(),true,nil,bd[2].usd) end
 				end
 				body:setUserData(nil)
 			end
