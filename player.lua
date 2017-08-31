@@ -69,7 +69,7 @@ local player = {
 								cor=coords,
 								col={rr,gg,bb},
 								img=nil,
-								ese=[[return {}]],
+								ese=[[return {beginContact=function(fixture,b,coll) b:getBody():applyLinearImpulse(math.random(-9e4,9e4),math.random(-9e4,9e4)) end, endContact=function(fixture,b,coll)  fixture:getBody():setUserData({'pos',math.random(-2100,2100),math.random(-1100,1100)}) end,}]]--[[return {}]],
 								nev=math.random(0,9e9),
 							} -- objektum
 						if player.kijelolve then -- ha van kijelölve objektum, annak a body-ához adja
@@ -199,6 +199,11 @@ local player = {
 								fixture:getBody():setUserData({'d2',b:getUserData(),0,0})
 							end
 						end,
+						}]])
+				elseif key=="j" then
+					map:setObj(player.kijelolve:getUserData().usd,[[return {
+							beginContact=function(fixture,b,coll) b:getBody():applyLinearImpulse(math.random(-9e4,9e4),math.random(-9e4,9e4)) end,
+							endContact=function(fixture,b,coll)  fixture:getBody():setUserData({'pos',math.random(-2100,2100),math.random(-1100,1100)}) end,
 						}]])
 				end
 				player.kijelolve=nil
